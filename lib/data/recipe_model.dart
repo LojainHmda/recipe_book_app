@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 class RecipeModel {
   final int id;
@@ -41,6 +38,20 @@ this.isFav =false,
       ingredients: List<String>.from(json['ingredients'] ?? []),
       instructions: List<String>.from(json['instructions'] ?? []),
     );
+  }
+  Map<String, dynamic> toJson() {
+    final totalMinutes = int.tryParse(cookingTime.replaceAll(' min', '')) ?? 0;
+    return {
+      'id': id,
+      'image': mealImage,
+      'cuisine': countryName,
+      'name': mealTitle,
+      'mealType': mealType,
+      'rating': rating,
+      'prepTimeMinutes': totalMinutes,
+      'ingredients': ingredients,
+      'instructions': instructions,
+    };
   }
 }
 

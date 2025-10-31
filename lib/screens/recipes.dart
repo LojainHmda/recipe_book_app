@@ -1,108 +1,90 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
-import 'package:recipe_book_app/cubit/is_fav_cubit.dart';
-import 'package:recipe_book_app/cubit/is_fav_states.dart';
-import 'package:recipe_book_app/data/recipe_model.dart';
-import 'package:recipe_book_app/widgets/custom_app_bar.dart';
+import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
+import 'package:recipe_book_app/theme/colors.dart';
+import 'package:recipe_book_app/theme/fonts.dart';
 import 'package:recipe_book_app/widgets/discover_widget.dart';
 import 'package:recipe_book_app/widgets/recipes_list_widget.dart';
 import 'package:recipe_book_app/widgets/view_all_widget.dart'
     show ViewAllwidget;
 import 'package:recipe_book_app/widgets/weekly_pick_widget.dart';
 
-class RecipesScreen extends StatefulWidget {
+class RecipesScreen extends StatelessWidget {
   const RecipesScreen({super.key});
 
   @override
-  State<RecipesScreen> createState() => _RecipesScreenState();
-}
-
-class _RecipesScreenState extends State<RecipesScreen> {
-  List<RecipeModel> recentRecipes = [];
-  List<RecipeModel> favoriteRecipes = [];
-  int index = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchRecipes();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.only(left: 19, right: 19, top: 58),
-          child: SingleChildScrollView(
-            child: BlocProvider<IsFavCubit>(
-              create: (BuildContext context) {
-                return IsFavCubit();
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomAppBar(),
-                  SizedBox(height: 20),
-                  WeeklyPickWidget(),
-                  SizedBox(height: 20),
-                  DiscoverWidget(),
-                  SizedBox(height: 20),
-                  ViewAllwidget(title: "Recent Recipes"),
-                  SizedBox(height: 14),
-                  SizedBox(
-                    height: 140,
-                    child: RecipesList(
-                      recipesList: recentRecipes,
-                      listLength: 20,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  ViewAllwidget(title: "Favorite Recipes"),
-                  SizedBox(height: 14),
-                  SizedBox(
-                    height: 140,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Explor Recipes", style: Fonts.titlesFont24),
 
-                    child: BlocBuilder<IsFavCubit, IsFavStates>(
-                      builder: (context, state) {
-                        return RecipesList(
-                          recipesList: updateFavorites(),
-                          listLength: favoriteRecipes.length,
-                        );
-                      },
-                    ),
-                  ),
-                ],
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.grey),
+                ),
+
+                child: IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.add, color: AppColors.primaryColor),
+                ),
               ),
+            ],
+          ),
+          SizedBox(height: 20),
+          WeeklyPickWidget(),
+          SizedBox(height: 20),
+          DiscoverWidget(),
+          SizedBox(height: 20),
+          ViewAllwidget(title: "Recent Recipes"),
+          SizedBox(height: 14),
+          BlocBuilder<LoadRecipesCubit, LoadRecipesState>(
+            builder: (context, state) {
+              if (state is LoadedRecipesState) {
+                return SizedBox(
+                  height: 140,
+                  child: RecipesList(
+                    recipesList: state.recentRecipes,
+                    listLength: 20,
+                  ),
+                );
+              } else {
+                return CircularProgressIndicator();
+              }
+            },
+          ),
+
+          SizedBox(height: 20),
+          ViewAllwidget(title: "Favorite Recipes"),
+          SizedBox(height: 14),
+          SizedBox(
+            height: 140,
+            child: BlocBuilder<LoadRecipesCubit, LoadRecipesState>(
+              builder: (context, state) {
+                final favList = context
+                    .read<LoadRecipesCubit>()
+                    .favoriteRecipes;
+                if (favList.isEmpty)
+                  return Center(
+                    child: Text(
+                      "There is no favorites yet",
+                      style: Fonts.primaryColor14,
+                    ),
+                  );
+                return RecipesList(
+                  recipesList: favList,
+                  listLength: favList.length,
+                );
+              },
             ),
           ),
-        ),
+        ],
       ),
     );
-  }
-
-  List<RecipeModel> updateFavorites() {
-    favoriteRecipes = recentRecipes.where((r) => r.isFav).toList();
-    return favoriteRecipes;
-  }
-
-  Future<void> fetchRecipes() async {
-    final response = await http.get(Uri.parse('https://dummyjson.com/recipes'));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List recipes = data['recipes'];
-
-      setState(() {
-        recentRecipes = recipes
-            .map((json) => RecipeModel.fromJson(json))
-            .toList();
-      });
-    } else {
-      throw Exception('Failed to load recipes');
-    }
   }
 }
