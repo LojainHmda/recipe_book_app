@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
 import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
 import 'package:recipe_book_app/theme/colors.dart';
 import 'package:recipe_book_app/theme/fonts.dart';
@@ -65,21 +66,38 @@ class RecipesScreen extends StatelessWidget {
           SizedBox(
             height: 140,
             child: BlocBuilder<LoadRecipesCubit, LoadRecipesState>(
-              builder: (context, state) {
-                final favList = context
-                    .read<LoadRecipesCubit>()
-                    .favoriteRecipes;
-                if (favList.isEmpty)
+              builder: (context, recipeState) {
+                final favList = context.read<AuthCubit>().userModel.fav;
+
+                if (favList.isEmpty) {
                   return Center(
                     child: Text(
-                      "There is no favorites yet",
+                      "There are no favorites yet",
                       style: Fonts.primaryColor14,
                     ),
                   );
-                return RecipesList(
-                  recipesList: favList,
-                  listLength: favList.length,
-                );
+                }
+
+                if (recipeState is LoadedRecipesState) {
+                  // هون منعمل BlocBuilder تاني جواته لحتى يسمع لتغييرات المستخدم
+                  return BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, authState) {
+                      final favRecipes = recipeState.recentRecipes
+                          .where((e) => favList.contains(e.id.toString()))
+                          .toList();
+
+                      return SizedBox(
+                        height: 140,
+                        child: RecipesList(
+                          recipesList: favRecipes,
+                          listLength: favRecipes.length,
+                        ),
+                      );
+                    },
+                  );
+                }
+
+                return const Center(child: CircularProgressIndicator());
               },
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
 import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
 import 'package:recipe_book_app/data/recipe_model.dart';
 import 'package:recipe_book_app/screens/meal_screen.dart';
@@ -14,14 +15,10 @@ class MealCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => MealScreen(recipe: model),
-  ),
-);
-
-
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MealScreen(recipe: model)),
+        );
       },
       child: Container(
         height: 140,
@@ -40,7 +37,7 @@ Navigator.push(
                 fit: BoxFit.cover,
               ),
             ),
-      
+
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -51,13 +48,12 @@ Navigator.push(
                 ),
               ),
             ),
-      
+
             Positioned(
               top: 8,
               right: 9,
               child: InkWell(
-                onTap: () =>
-                    context.read<LoadRecipesCubit>().toggleFavorite(model.id),
+                onTap: () => context.read<AuthCubit>().toggleFavorite(model.id),
                 borderRadius: BorderRadius.circular(6),
                 child: Container(
                   height: 26,
@@ -66,15 +62,28 @@ Navigator.push(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Icon(
-                    model.isFav ? Icons.favorite : Icons.favorite_border,
-                    color: model.isFav ? Colors.red : Colors.white,
-                    size: 16.5,
+                  child: BlocBuilder<AuthCubit, AuthState>(
+                    builder: (context, state) {
+                      return Icon(
+                        context.read<AuthCubit>().userModel.fav.contains(
+                              model.id.toString(),
+                            )
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color:
+                            context.read<AuthCubit>().userModel.fav.contains(
+                              model.id.toString(),
+                            )
+                            ? Colors.red
+                            : Colors.white,
+                        size: 16.5,
+                      );
+                    },
                   ),
                 ),
               ),
             ),
-      
+
             Positioned(
               left: 9,
               bottom: 8,

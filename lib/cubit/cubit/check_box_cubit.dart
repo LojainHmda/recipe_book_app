@@ -1,19 +1,8 @@
-import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 
-part 'check_box_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class CheckBoxCubit extends Cubit<CheckBoxState> {
-  CheckBoxCubit() : super(UnChecked());
-
-  bool flag = false;
-
-  check() {
-    flag = !flag;
-    if (flag) {
-      emit(Checked());
-    } else {
-      emit(UnChecked());
-    }
-  }
+class CheckBoxCubit extends Cubit<bool> {
+  CheckBoxCubit() : super(false);
+  
+  void toggle() => emit(!state);
 }

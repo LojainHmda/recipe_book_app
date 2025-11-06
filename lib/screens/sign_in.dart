@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
 import 'package:recipe_book_app/theme/colors.dart';
 import 'package:recipe_book_app/theme/fonts.dart';
 import 'package:recipe_book_app/widgets/button_primary.dart';
@@ -10,8 +12,8 @@ class SignInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final TextEditingController emailController = TextEditingController();
-        final TextEditingController passController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passController = TextEditingController();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -55,7 +57,26 @@ class SignInScreen extends StatelessWidget {
               ),
               SizedBox(height: 24),
 
-              PrimaryButton(label: "Login", width: double.infinity),
+              PrimaryButton(
+                label: "Login",
+                width: double.infinity,
+                onPressed: () async {
+                  if (emailController.text.isEmpty ||
+                      passController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please fill in all fields'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  await context.read<AuthCubit>().signIn(
+                    emailController.text,
+                    passController.text,
+                  );
+                },
+              ),
 
               //divider
               SizedBox(height: 25),
@@ -88,7 +109,9 @@ class SignInScreen extends StatelessWidget {
                       minimumSize: Size(0, 0),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/signUp');
+                    },
                     child: Text(
                       " Sign up",
                       style: Fonts.darkGreen15.copyWith(

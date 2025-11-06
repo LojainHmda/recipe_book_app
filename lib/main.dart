@@ -1,32 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
 import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
 import 'package:recipe_book_app/screens/explore.dart';
 import 'package:recipe_book_app/screens/food_list_by_country.dart';
+import 'package:recipe_book_app/screens/sign_in.dart';
 import 'package:recipe_book_app/screens/sign_up.dart';
 import 'package:recipe_book_app/screens/recipes.dart';
 import 'package:recipe_book_app/theme/colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
 import 'screens/profile.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  final LoadRecipesCubit cubit = LoadRecipesCubit();
 
   runApp(
-    BlocProvider.value(
-      value: cubit,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: HomeScreen(),
-        routes: {"/foodListByCountry": (context) => FoodListByCountry()},
-      ),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>(create: (_) => AuthCubit()),
+        BlocProvider<LoadRecipesCubit>(create: (_) => LoadRecipesCubit()),
+      ],
+      child: MyApp(),
     ),
   );
 }
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: BlocConsumer<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is SignIn) {
+            Navigator.pushReplacementNamed(context, "/Home");
+          } else if (state is AuthError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
+        builder: (context, state) {
+          return SignInScreen();
+        },
+      ),
+      routes: {
+        "/foodListByCountry": (_) => FoodListByCountry(),
+        "/Home": (_) => HomeScreen(),
+        "/Login": (_) => SignInScreen(),
+        "/signUp": (_) => SignUpScreen(),
+      },
+    );
+  }
+}
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,7 +78,6 @@ class _RecipesScreenState extends State<HomeScreen> {
     final cubit = context.read<LoadRecipesCubit>();
 
     await cubit.loading();
-    await cubit.getSharedPreferences();
     await cubit.cuntryFood();
   }
 

@@ -28,41 +28,6 @@ class LoadRecipesCubit extends Cubit<LoadRecipesState> {
     emit(LoadedRecipesState(recentRecipes: recentRecipes));
   }
 
-  void toggleFavorite(int recipeId) {
-    final index = recentRecipes.indexWhere((r) => r.id == recipeId);
-    if (index != -1) {
-      recentRecipes[index].isFav = !recentRecipes[index].isFav;
-      emit(LoadedRecipesState(recentRecipes: List.from(recentRecipes)));
-    }
-    setsharedPreferences();
-  }
-
-  List<RecipeModel> get favoriteRecipes {
-    return recentRecipes.where((e) => e.isFav).toList();
-  }
-
-  setsharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> favList = favoriteRecipes
-        .map((r) => jsonEncode(r.toJson()))
-        .toList();
-    await prefs.setStringList('favorites', favList);
-  }
-
-  getSharedPreferences() async {
-    List<RecipeModel> favList;
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getStringList('favorites') != null) {
-      favList = (prefs.getStringList(
-        'favorites',
-      ))!.map((s) => RecipeModel.fromJson(jsonDecode(s))).toList();
-      for (var i in favList) {
-        final index = recentRecipes.indexWhere((r) => r.id == i.id);
-        recentRecipes[index].isFav = true;
-      }
-      emit(LoadedRecipesState(recentRecipes: List.from(recentRecipes)));
-    }
-  }
 
   Future cuntryFood() async {
     final countries = recentRecipes.map((i) => i.countryName).toSet();

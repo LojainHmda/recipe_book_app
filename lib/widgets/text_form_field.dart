@@ -17,6 +17,8 @@ final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
+      
       style: Fonts.darkGreen16,
       decoration: InputDecoration(
         hintText: hintText,

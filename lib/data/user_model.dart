@@ -1,14 +1,16 @@
 class UserModel {
-  final String name;
-  final String email;
+   String name;
+   String email;
   final String uid; 
-  final String? userProfile;
+   String userProfile;
+   List<String> fav;
 
   UserModel({
     required this.name,
     required this.email,
     required this.uid, 
-    this.userProfile,
+    this.userProfile="",
+    this.fav = const [],
   });
 
   Map<String, dynamic> toJson() {
@@ -17,15 +19,18 @@ class UserModel {
       'email': email,
       'uid': uid,   
       'userProfile': userProfile,
+      'fav': fav,
     };
   }
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      name: json['name'],
-      email: json['email'],
-      uid: json['uid'], 
-      userProfile: json['userProfile'],
-    );
-  }
+factory UserModel.fromJson(Map<String, dynamic> json) {
+  return UserModel(
+    uid: json['uid'] ?? '',
+    name: json['name'] ?? '',
+    email: json['email'] ?? '',
+    userProfile: json['userProfile'] ?? '',
+    fav: List<String>.from(json['fav'] ?? []),
+  );
+}
+
 }

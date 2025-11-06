@@ -71,4 +71,5 @@ class DefaultFirebaseOptions {
     authDomain: 'recipebook-13ab2.firebaseapp.com',
     storageBucket: 'recipebook-13ab2.firebasestorage.app',
   );
+
 }
