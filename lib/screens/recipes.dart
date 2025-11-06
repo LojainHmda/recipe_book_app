@@ -79,7 +79,6 @@ class RecipesScreen extends StatelessWidget {
                 }
 
                 if (recipeState is LoadedRecipesState) {
-                  // هون منعمل BlocBuilder تاني جواته لحتى يسمع لتغييرات المستخدم
                   return BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, authState) {
                       final favRecipes = recipeState.recentRecipes
