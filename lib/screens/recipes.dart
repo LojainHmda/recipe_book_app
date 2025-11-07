@@ -67,36 +67,42 @@ class RecipesScreen extends StatelessWidget {
             height: 140,
             child: BlocBuilder<LoadRecipesCubit, LoadRecipesState>(
               builder: (context, recipeState) {
-                final favList = context.read<AuthCubit>().userModel.fav;
+                return BlocBuilder<AuthCubit, AuthState>(
+                  builder: (context, authState) {
+                    final favList = context.watch<AuthCubit>().userModel.fav;
 
-                if (favList.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "There are no favorites yet",
-                      style: Fonts.primaryColor14,
-                    ),
-                  );
-                }
+                    if (favList.isEmpty) {
+                      return Center(
+                        child: Text(
+                          "There are no favorites yet",
+                          style: Fonts.primaryColor14,
+                        ),
+                      );
+                    }
 
-                if (recipeState is LoadedRecipesState) {
-                  return BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, authState) {
+                    if (recipeState is LoadedRecipesState) {
                       final favRecipes = recipeState.recentRecipes
                           .where((e) => favList.contains(e.id.toString()))
                           .toList();
 
-                      return SizedBox(
-                        height: 140,
-                        child: RecipesList(
-                          recipesList: favRecipes,
-                          listLength: favRecipes.length,
-                        ),
-                      );
-                    },
-                  );
-                }
+                      if (favRecipes.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "No favorite recipes found",
+                            style: Fonts.primaryColor14,
+                          ),
+                        );
+                      }
 
-                return const Center(child: CircularProgressIndicator());
+                      return RecipesList(
+                        recipesList: favRecipes,
+                        listLength: favRecipes.length,
+                      );
+                    }
+
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
               },
             ),
           ),

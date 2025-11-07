@@ -11,6 +11,7 @@ import 'package:recipe_book_app/theme/colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/profile.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -18,7 +19,7 @@ Future<void> main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider<AuthCubit>(create: (_) => AuthCubit()),
+        BlocProvider<AuthCubit>(create: (_) => AuthCubit()..autoLogin()),
         BlocProvider<LoadRecipesCubit>(create: (_) => LoadRecipesCubit()),
       ],
       child: MyApp(),
@@ -36,13 +37,20 @@ class MyApp extends StatelessWidget {
           if (state is SignIn) {
             Navigator.pushReplacementNamed(context, "/Home");
           } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         builder: (context, state) {
-          return SignInScreen();
+          if (state is AuthLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (state is SignIn) {
+            return HomeScreen();
+          } else {
+            return SignInScreen();
+          }
         },
       ),
       routes: {
@@ -54,7 +62,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

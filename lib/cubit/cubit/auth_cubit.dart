@@ -17,18 +17,38 @@ class AuthCubit extends Cubit<AuthState> {
     fav: [],
     userProfile: "",
   );
-
-  Future<void> signUp(String email, String password, String name) async {
-    emit(AuthLoading());
+  signUp(String email, String password, String name) async {
     try {
+      emit(AuthLoading());
       UserCredential credential = await Services.signUp(email, password, name);
       FirebaseFirestore firestoreService = FirebaseFirestore.instance;
       var snapshot = await firestoreService
           .collection("users")
           .doc(credential.user!.uid)
           .get();
+      if (!snapshot.exists) throw Exception("User data not found.");
       Map<String, dynamic>? json = snapshot.data();
       userModel = UserModel.fromJson(json!);
+      setSharedPreferences(credential.user!.uid);
+      emit(SignIn(user: userModel));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  signIn(String email, String password) async {
+    try {
+      emit(AuthLoading());
+      UserCredential credential = await Services.signIn(email, password);
+      FirebaseFirestore firestoreService = FirebaseFirestore.instance;
+      var snapshot = await firestoreService
+          .collection("users")
+          .doc(credential.user!.uid)
+          .get();
+      if (!snapshot.exists) throw Exception("User data not found.");
+      Map<String, dynamic>? json = snapshot.data();
+      userModel = UserModel.fromJson(json!);
+      setSharedPreferences(credential.user!.uid);
       emit(SignIn(user: userModel));
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -36,20 +56,13 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   logout() async {
-    await Services.signout();
-    emit(AuthInitial());
-  }
-
-  signIn(String email, String password) async {
-    UserCredential credential = await Services.signIn(email, password);
-    FirebaseFirestore firestoreService = FirebaseFirestore.instance;
-    var snapshot = await firestoreService
-        .collection("users")
-        .doc(credential.user!.uid)
-        .get();
-    Map<String, dynamic>? json = snapshot.data();
-    userModel = UserModel.fromJson(json!);
-    emit(SignIn(user: userModel));
+    try {
+      await Services.signout();
+      removeSharedPreferences();
+      emit(AuthInitial());
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
   }
 
   update({
@@ -83,37 +96,38 @@ class AuthCubit extends Cubit<AuthState> {
     } else {
       userModel.fav.add(idStr);
     }
-        emit(UserUpdated(user: userModel));
+    emit(UserUpdated(user: userModel));
 
     await update(fav: userModel.fav);
   }
 
-  // void toggleFavorite(int recipeId) {
+  Future<void> setSharedPreferences(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("uid", uid);
+  }
 
-  //   setsharedPreferences();
-  // }
+  Future<String?> getSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("uid");
+  }
 
-  // setsharedPreferences() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //  UserModel user = favoriteRecipes
-  //       .map((r) => jsonEncode(r.toJson()))
-  //       .toList();
+  Future<void> removeSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("uid");
+  }
 
-  //   await prefs.setStringList('user', favList);
-  // }
+  Future<void> autoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString("uid");
+    if (uid != null && uid.isNotEmpty) {
+      emit(AuthLoading());
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      var snapshot = await firestore.collection("users").doc(uid).get();
+      if (snapshot.exists) {
+        userModel = UserModel.fromJson(snapshot.data()!);
 
-  // getSharedPreferences() async {
-  //   List<RecipeModel> favList;
-  //   final prefs = await SharedPreferences.getInstance();
-  //   if (prefs.getStringList('favorites') != null) {
-  //     favList = (prefs.getStringList(
-  //       'favorites',
-  //     ))!.map((s) => RecipeModel.fromJson(jsonDecode(s))).toList();
-  //     for (var i in favList) {
-  //       final index = recentRecipes.indexWhere((r) => r.id == i.id);
-  //       recentRecipes[index].isFav = true;
-  //     }
-  //     emit(LoadedRecipesState(recentRecipes: List.from(recentRecipes)));
-  //   }
-  // }
+        emit(SignIn(user: userModel));
+      }
+    }
+  }
 }

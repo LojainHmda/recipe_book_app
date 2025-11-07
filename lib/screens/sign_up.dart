@@ -97,7 +97,6 @@ class SignUpScreen extends StatelessWidget {
                                   content: Text('Please accept terms & conditions'),
                                 ),
                               );
-                              return;
                             }
 
                             if (emailController.text.isEmpty ||
@@ -106,7 +105,6 @@ class SignUpScreen extends StatelessWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Please fill in all fields')),
                               );
-                              return;
                             }
 
                             await context.read<AuthCubit>().signUp(
