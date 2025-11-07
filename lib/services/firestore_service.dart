@@ -35,28 +35,12 @@ class Services {
     return credentials;
   }
 
-  static Future<void> editUserInfo({
-    String? name,
-    String? password,
-
-    String? email,
-    String? userProfile,
-    List<String>? fav,
-  }) async {
+  static Future<void> editUserInfo(Map<String, dynamic> updates,) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     final uid = auth.currentUser?.uid;
     if (uid == null) return;
-
-    final updates = <String, dynamic>{};
-
-    if (name != null) updates['name'] = name;
-    if (email != null) await auth.currentUser!.verifyBeforeUpdateEmail(email);
-
-    if (password != null) await auth.currentUser!.updatePassword(password);
-    if (userProfile != null) updates['userProfile'] = userProfile;
-    if (fav != null) updates['fav'] = fav;
 
     await firestore.collection("users").doc(uid).update(updates);
   }

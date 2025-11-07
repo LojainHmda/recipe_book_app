@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
-import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
 import 'package:recipe_book_app/data/recipe_model.dart';
 import 'package:recipe_book_app/screens/meal_screen.dart';
 import 'package:recipe_book_app/theme/fonts.dart';

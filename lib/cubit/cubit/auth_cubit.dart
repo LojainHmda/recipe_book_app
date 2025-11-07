@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:meta/meta.dart';
 import 'package:recipe_book_app/data/user_model.dart';
 import 'package:recipe_book_app/services/firestore_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,27 +64,20 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  update({
-    String? email,
-    String? password,
-    String? name,
-    List<String>? fav,
-    String? userProfile,
-  }) async {
+  
+  Future<void> update({String? email, String? password, String? name, List<String>? fav, String? userProfile}) async {
     if (name != null) userModel.name = name;
     if (email != null) userModel.email = email;
     if (fav != null) userModel.fav = fav;
     if (userProfile != null) userModel.userProfile = userProfile;
 
-    Map<String, dynamic> updates = userModel.toJson();
+    Map<String, dynamic> updates = {};
+    if (name != null) updates['name'] = name;
+    if (email != null) updates['email'] = email;
+    if (fav != null) updates['fav'] = fav;
+    if (userProfile != null) updates['userProfile'] = userProfile;
 
-    await Services.editUserInfo(
-      name: updates['name'],
-      email: updates['email'],
-      password: updates['password'],
-      fav: updates['fav'],
-      userProfile: updates['userProfile'],
-    );
+    await Services.editUserInfo(updates);
     emit(UserUpdated(user: userModel));
   }
 
@@ -96,11 +88,8 @@ class AuthCubit extends Cubit<AuthState> {
     } else {
       userModel.fav.add(idStr);
     }
-    emit(UserUpdated(user: userModel));
-
     await update(fav: userModel.fav);
   }
-
   Future<void> setSharedPreferences(String uid) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("uid", uid);
