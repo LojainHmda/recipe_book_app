@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
+import 'package:recipe_book_app/cubit/user_edit_cubit/user_edit_cubit.dart';
+import 'package:recipe_book_app/data/recent_recipes_sqlite_db.dart';
 import 'package:recipe_book_app/data/recipe_model.dart';
 import 'package:recipe_book_app/screens/meal_screen.dart';
 import 'package:recipe_book_app/theme/fonts.dart';
 
 class MealCardWidget extends StatelessWidget {
-  const MealCardWidget({super.key, required this.model});
   final RecipeModel model;
+  const MealCardWidget({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +19,7 @@ class MealCardWidget extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (context) => MealScreen(recipe: model)),
         );
+        context.read<UserEditCubit>().insert(model.id.toString());
       },
       child: Container(
         height: 140,
@@ -36,7 +38,6 @@ class MealCardWidget extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -47,42 +48,43 @@ class MealCardWidget extends StatelessWidget {
                 ),
               ),
             ),
-
             Positioned(
               top: 8,
               right: 9,
-              child: InkWell(
-                onTap: () => context.read<AuthCubit>().toggleFavorite(model.id),
+              child: Material(
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  height: 26,
-                  width: 26,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(6),
+                child: InkWell(
+                  onTap: () => context.read<UserEditCubit>().toggleFav(
+                    model.id.toString(),
                   ),
-                  child: BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, state) {
-                      return Icon(
-                        context.read<AuthCubit>().userModel.fav.contains(
-                              model.id.toString(),
-                            )
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color:
-                            context.read<AuthCubit>().userModel.fav.contains(
-                              model.id.toString(),
-                            )
-                            ? Colors.red
-                            : Colors.white,
-                        size: 16.5,
-                      );
-                    },
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    height: 26,
+                    width: 26,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: BlocBuilder<UserEditCubit, UserEditState>(
+                      builder: (context, state) {
+                        final isFav = context
+                            .read<UserEditCubit>()
+                            .authCubit
+                            .userModel
+                            .fav
+                            .contains(model.id.toString());
+                        return Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? Colors.red : Colors.white,
+                          size: 16.5,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
             ),
-
             Positioned(
               left: 9,
               bottom: 8,

@@ -13,18 +13,18 @@ class TextFomfieldWidget extends StatelessWidget {
   final Icon icon;
   final String hintText;
   Icon? icon2;
-final TextEditingController controller; 
+  final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      
+
       style: Fonts.darkGreen16,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: Fonts.darkGreen15,
         suffixIcon: Padding(
-          padding: const EdgeInsets.only(right: 24,left: 10),
+          padding: const EdgeInsets.only(right: 24, left: 10),
           child: icon2 ?? SizedBox(),
         ),
         prefixIcon: Padding(

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
-import 'package:recipe_book_app/cubit/cubit/check_box_cubit.dart';
+import 'package:recipe_book_app/cubit/auth_cubit/auth_cubit.dart';
+import 'package:recipe_book_app/cubit/check_box_cubit.dart';
+import 'package:recipe_book_app/screens/sign_in.dart';
 import 'package:recipe_book_app/theme/colors.dart';
 import 'package:recipe_book_app/theme/fonts.dart';
-import 'package:recipe_book_app/widgets/button_primary.dart';
+import 'package:recipe_book_app/widgets/buttons/button_primary.dart';
 import 'package:recipe_book_app/widgets/text_form_field.dart';
 import '../widgets/social_media_widget.dart';
 
@@ -17,16 +18,19 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocProvider(
-        create: (_) => CheckBoxCubit(),
-        child: SingleChildScrollView(
+    return BlocProvider<CheckBoxCubit>(
+      create: (_) => CheckBoxCubit(),
+      child: Scaffold(
+        body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 120, 20, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Welcome to Recipe Passport App", style: Fonts.titlesFont32),
+                Text(
+                  "Welcome to Recipe Passport App",
+                  style: Fonts.titlesFont32,
+                ),
                 const SizedBox(height: 10),
                 Text(
                   "Please enter your account details below!",
@@ -37,7 +41,10 @@ class SignUpScreen extends StatelessWidget {
                 // Form fields
                 TextFomfieldWidget(
                   controller: nameController,
-                  icon: Icon(Icons.person_2_outlined, color: AppColors.darkGreen3),
+                  icon: Icon(
+                    Icons.person_2_outlined,
+                    color: AppColors.darkGreen3,
+                  ),
                   hintText: "Full Name",
                 ),
                 const SizedBox(height: 16),
@@ -50,7 +57,10 @@ class SignUpScreen extends StatelessWidget {
                 TextFomfieldWidget(
                   controller: passwordController,
                   icon: Icon(Icons.lock_outlined, color: AppColors.darkGreen3),
-                  icon2: Icon(Icons.remove_red_eye_outlined, color: AppColors.darkGreen3),
+                  icon2: Icon(
+                    Icons.remove_red_eye_outlined,
+                    color: AppColors.darkGreen3,
+                  ),
                   hintText: "Password",
                 ),
                 const SizedBox(height: 8),
@@ -61,11 +71,17 @@ class SignUpScreen extends StatelessWidget {
                     BlocBuilder<CheckBoxCubit, bool>(
                       builder: (context, state) {
                         return Checkbox(
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
                           activeColor: AppColors.primaryColor,
                           checkColor: Colors.white,
-                          side: BorderSide(color: AppColors.primaryColor, width: 2),
+                          side: BorderSide(
+                            color: AppColors.primaryColor,
+                            width: 2,
+                          ),
                           value: state,
                           onChanged: (_) {
                             context.read<CheckBoxCubit>().toggle();
@@ -73,53 +89,52 @@ class SignUpScreen extends StatelessWidget {
                         );
                       },
                     ),
-                    Text("Accept terms & Condition", style: Fonts.primaryColor14),
+                    Text(
+                      "Accept terms & Condition",
+                      style: Fonts.primaryColor14,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
 
-                // Continue button
-                BlocBuilder<AuthCubit, AuthState>(
+                BlocBuilder<CheckBoxCubit, bool>(
                   builder: (context, state) {
-                    if (state is AuthLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                    return PrimaryButton(
+                      label: "Continue",
+                      width: double.infinity,
+                      onPressed: () async {
+                        final isChecked = context.read<CheckBoxCubit>().state;
+                        if (isChecked == false) {
+                          print(context.read<CheckBoxCubit>().state);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please accept terms & conditions'),
+                            ),
+                          );
+                          return;
+                        }
 
-                    return BlocBuilder<CheckBoxCubit, bool>(
-                      builder: (context, isChecked) {
-                        return PrimaryButton(
-                          label: "Continue",
-                          width: double.infinity,
-                          onPressed: () async {
-                            if (!isChecked) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please accept terms & conditions'),
-                                ),
-                              );
-                            }
+                        if (emailController.text.isEmpty ||
+                            passwordController.text.isEmpty ||
+                            nameController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fill in all fields'),
+                            ),
+                          );
+                          return;
+                        }
 
-                            if (emailController.text.isEmpty ||
-                                passwordController.text.isEmpty ||
-                                nameController.text.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Please fill in all fields')),
-                              );
-                            }
-
-                            await context.read<AuthCubit>().signUp(
-                                  emailController.text,
-                                  passwordController.text,
-                                  nameController.text,
-                                );
-
-                                
-                          },
+                        await context.read<AuthCubit>().signUp(
+                          emailController.text,
+                          passwordController.text,
+                          nameController.text,
                         );
                       },
                     );
                   },
                 ),
+
                 const SizedBox(height: 25),
 
                 // Divider
@@ -143,7 +158,10 @@ class SignUpScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Already have account with us?", style: Fonts.darkGreen15),
+                    Text(
+                      "Already have account with us?",
+                      style: Fonts.darkGreen15,
+                    ),
                     TextButton(
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
@@ -151,7 +169,7 @@ class SignUpScreen extends StatelessWidget {
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/Login');
+                        context.read<AuthCubit>().goToSignIn();
                       },
                       child: Text(
                         "Sign in",

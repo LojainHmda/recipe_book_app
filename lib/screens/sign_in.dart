@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
+import 'package:recipe_book_app/cubit/auth_cubit/auth_cubit.dart';
+import 'package:recipe_book_app/screens/sign_up.dart';
 import 'package:recipe_book_app/theme/colors.dart';
 import 'package:recipe_book_app/theme/fonts.dart';
-import 'package:recipe_book_app/widgets/button_primary.dart';
+import 'package:recipe_book_app/widgets/buttons/button_primary.dart';
 import 'package:recipe_book_app/widgets/social_media_widget.dart';
 import 'package:recipe_book_app/widgets/text_form_field.dart';
 
@@ -110,7 +111,7 @@ class SignInScreen extends StatelessWidget {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/signUp');
+                      context.read<AuthCubit>().goToSignUp();
                     },
                     child: Text(
                       " Sign up",

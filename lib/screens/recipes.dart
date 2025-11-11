@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:recipe_book_app/cubit/cubit/auth_cubit.dart';
+import 'package:recipe_book_app/cubit/user_edit_cubit/user_edit_cubit.dart';
 import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
 import 'package:recipe_book_app/theme/colors.dart';
 import 'package:recipe_book_app/theme/fonts.dart';
@@ -42,7 +42,7 @@ class RecipesScreen extends StatelessWidget {
           SizedBox(height: 20),
           DiscoverWidget(),
           SizedBox(height: 20),
-          ViewAllwidget(title: "Recent Recipes"),
+          ViewAllwidget(title: "All Recipes"),
           SizedBox(height: 14),
           BlocBuilder<LoadRecipesCubit, LoadRecipesState>(
             builder: (context, state) {
@@ -50,12 +50,16 @@ class RecipesScreen extends StatelessWidget {
                 return SizedBox(
                   height: 140,
                   child: RecipesList(
-                    recipesList: state.recentRecipes,
+                    recipesList: state.allRecipes,
                     listLength: 20,
                   ),
                 );
               } else {
-                return CircularProgressIndicator();
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  ),
+                );
               }
             },
           ),
@@ -66,43 +70,46 @@ class RecipesScreen extends StatelessWidget {
           SizedBox(
             height: 140,
             child: BlocBuilder<LoadRecipesCubit, LoadRecipesState>(
-              builder: (context, recipeState) {
-                return BlocBuilder<AuthCubit, AuthState>(
-                  builder: (context, authState) {
-                    final favList = context.watch<AuthCubit>().userModel.fav;
-
-                    if (favList.isEmpty) {
-                      return Center(
-                        child: Text(
-                          "There are no favorites yet",
-                          style: Fonts.primaryColor14,
-                        ),
-                      );
-                    }
-
-                    if (recipeState is LoadedRecipesState) {
-                      final favRecipes = recipeState.recentRecipes
-                          .where((e) => favList.contains(e.id.toString()))
-                          .toList();
-
-                      if (favRecipes.isEmpty) {
+              builder: (context, state) {
+                if (state is LoadedRecipesState) {
+                  return BlocBuilder<UserEditCubit, UserEditState>(
+                    builder: (context, state) {
+                      if (context.read<UserEditCubit>().authCubit.userModel.fav.isEmpty) {
                         return Center(
                           child: Text(
-                            "No favorite recipes found",
+                            "There are no favorites yet",
                             style: Fonts.primaryColor14,
                           ),
                         );
+                      } else {
+                        var recipesList = context
+                            .read<LoadRecipesCubit>()
+                            .allRecipes
+                            .where(
+                              (e) => context
+                                  .read<UserEditCubit>().authCubit
+                                  .userModel
+                                  .fav
+                                  .contains(e.id.toString()),
+                            )
+                            .toList();
+                        return SizedBox(
+                          height: 140,
+                          child: RecipesList(
+                            recipesList: recipesList,
+                            listLength: recipesList.length,
+                          ),
+                        );
                       }
-
-                      return RecipesList(
-                        recipesList: favRecipes,
-                        listLength: favRecipes.length,
-                      );
-                    }
-
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                );
+                    },
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryColor,
+                    ),
+                  );
+                }
               },
             ),
           ),

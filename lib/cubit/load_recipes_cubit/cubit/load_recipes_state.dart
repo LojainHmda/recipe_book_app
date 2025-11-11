@@ -7,7 +7,7 @@ final class LoadRecipesInitial extends LoadRecipesState {}
 final class LoadingRecipesState extends LoadRecipesState {}
 
 final class LoadedRecipesState extends LoadRecipesState {
-  final List<RecipeModel> recentRecipes;
+  final List<RecipeModel> allRecipes;
 
-  LoadedRecipesState({required this.recentRecipes});
+  LoadedRecipesState({required this.allRecipes});
 }

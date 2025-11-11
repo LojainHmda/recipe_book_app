@@ -3,31 +3,31 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Services {
+  static FirebaseAuth auth = FirebaseAuth.instance;
+  static FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   static Future<UserCredential> signUp(
     String email,
     String password,
     String name, {
-    String userProfile ="",
-    List<String> fav=const[],
+    String userProfile = "",
+    List<String> fav = const [],
   }) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseFirestore firestoreService = FirebaseFirestore.instance;
     var credentials = await auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
     var uid = credentials.user!.uid;
-    await firestoreService.collection("users").doc(uid).set({
+    await firestore.collection("users").doc(uid).set({
       "name": name,
       "email": email,
       "userProfile": userProfile,
-      "fav": fav ,
+      "fav": fav,
     });
     return credentials;
   }
 
   static Future<UserCredential> signIn(String email, String password) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
     var credentials = await auth.signInWithEmailAndPassword(
       email: email,
       password: password,
@@ -35,10 +35,7 @@ class Services {
     return credentials;
   }
 
-  static Future<void> editUserInfo(Map<String, dynamic> updates,) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
+  static Future<void> editUserInfo(Map<String, dynamic> updates) async {
     final uid = auth.currentUser?.uid;
     if (uid == null) return;
 
@@ -46,7 +43,6 @@ class Services {
   }
 
   static Future<void> signout() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
     await auth.signOut();
   }
 }

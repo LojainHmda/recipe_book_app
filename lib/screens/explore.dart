@@ -4,12 +4,14 @@ import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubi
 import 'package:recipe_book_app/widgets/text_form_field.dart';
 import '../theme/fonts.dart';
 import 'food_list_by_country.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {    final TextEditingController searchController = TextEditingController();
+  Widget build(BuildContext context) {
+    final TextEditingController searchController = TextEditingController();
 
     return SingleChildScrollView(
       child: Column(
@@ -19,30 +21,24 @@ class ExploreScreen extends StatelessWidget {
           SizedBox(height: 14),
           TextFomfieldWidget(
             icon: Icon(Icons.search),
-            hintText: "Search anything...", controller:searchController ,
+            hintText: "Search anything...",
+            controller: searchController,
           ),
           SizedBox(height: 20),
           Text("Categories", style: Fonts.darkGreen20),
           SizedBox(height: 14),
-          BlocBuilder<LoadRecipesCubit, LoadRecipesState>(
-            builder: (context, state) {
-              List countries = context
-                  .read<LoadRecipesCubit>()
-                  .countryAndImage
-                  .keys
-                  .toList();
-
-              List images = context
-                  .read<LoadRecipesCubit>()
-                  .countryAndImage
-                  .values
-                  .toList();
-              if (state is LoadedRecipesState) {
+          FutureBuilder<Map<String, String>>(
+            future: context.read<LoadRecipesCubit>().getCountryandImg(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                final queries = snapshot.data!.entries.toList();
                 return GridView.builder(
                   padding: EdgeInsets.all(12),
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: countries.length,
+                  itemCount: queries.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 14,
@@ -50,13 +46,15 @@ class ExploreScreen extends StatelessWidget {
                     childAspectRatio: 161 / 80,
                   ),
                   itemBuilder: (context, index) {
+                    final country = queries[index].key;
+                    final image = queries[index].value;
                     return Stack(
                       alignment: Alignment.center,
                       children: [
                         GestureDetector(
                           onTap: () {
                             context.read<LoadRecipesCubit>().foodByCountry(
-                              countries[index],
+                              country,
                             );
                             Navigator.pushNamed(context, '/foodListByCountry');
                           },
@@ -68,28 +66,28 @@ class ExploreScreen extends StatelessWidget {
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  Image.network(
-                                    images[index],
-                                    fit: BoxFit.cover,
-                                    color: Colors.black.withOpacity(0.5),
-                                    colorBlendMode: BlendMode.darken,
-                                    height: 80,
-                                    width: 161,
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: image,
+                                      fit: BoxFit.cover,
+                                      color: Colors.black.withOpacity(0.5),
+                                      colorBlendMode: BlendMode.darken,
+                                      height: 80,
+                                      width: 161,
+                                    ),
                                   ),
-                                  Text(countries[index], style: Fonts.white160),
+
+                                  Text(country, style: Fonts.white160),
                                 ],
                               ),
                             ),
                           ),
                         ),
-
-                        Text(countries[index], style: Fonts.white160),
                       ],
                     );
                   },
                 );
-              } else {
-                return CircularProgressIndicator();
               }
             },
           ),

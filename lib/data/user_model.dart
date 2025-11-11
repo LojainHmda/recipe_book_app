@@ -1,7 +1,7 @@
 class UserModel {
    String name;
    String email;
-  final String uid; 
+   String uid; 
    String userProfile;
    List<String> fav;
 
@@ -32,5 +32,18 @@ factory UserModel.fromJson(Map<String, dynamic> json) {
     fav: List<String>.from(json['fav'] ?? []),
   );
 }
-
+ UserModel copyWith({
+    String? name,
+    String? email,
+    String? userProfile,
+    List<String>? fav,
+  }) {
+    return UserModel(
+      name: name ?? this.name,
+      email: email ?? this.email,
+      uid: uid, 
+      userProfile: userProfile ?? this.userProfile,
+      fav: fav ?? List<String>.from(this.fav),
+    );
+  }
 }

@@ -10,6 +10,7 @@ class RecipeModel {
   final String cookingTime;
   final List<String> ingredients;
   final List<String> instructions;
+  final int servings;
 
   RecipeModel({
 this.isFav =false,
@@ -22,6 +23,8 @@ this.isFav =false,
     required this.cookingTime,
     required this.ingredients,
     required this.instructions,
+        required this.servings,
+
   });
 
   factory RecipeModel.fromJson(Map json) {
@@ -37,6 +40,8 @@ this.isFav =false,
           "${(json['prepTimeMinutes'] ?? 0) + (json['cookTimeMinutes'] ?? 0)} min",
       ingredients: List<String>.from(json['ingredients'] ?? []),
       instructions: List<String>.from(json['instructions'] ?? []),
+            servings: json['servings'] ?? 1,
+
     );
   }
   Map<String, dynamic> toJson() {
@@ -51,6 +56,7 @@ this.isFav =false,
       'prepTimeMinutes': totalMinutes,
       'ingredients': ingredients,
       'instructions': instructions,
+      'servings': servings,
     };
   }
 }

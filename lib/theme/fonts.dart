@@ -82,4 +82,9 @@ class Fonts {
     fontWeight: FontWeight.w600,
     color: Colors.white,
   );
+    static TextStyle darkGreen16w = GoogleFonts.montserrat(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppColors.darkGreen3,
+  );
 }

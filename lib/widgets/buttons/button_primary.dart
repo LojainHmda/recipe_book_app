@@ -23,11 +23,13 @@ class PrimaryButton extends StatelessWidget {
       width: width,
       height: height,
       child: ElevatedButton(
+        
         onPressed: onPressed ?? () {},
         style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 5),
           backgroundColor: isActive
               ? AppColors.primaryColor
-              : AppColors.primaryColor.withOpacity(0.6),
+              : Colors.transparent,
 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
