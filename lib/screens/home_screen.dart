@@ -1,6 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_book_app/cubit/auth_cubit/auth_cubit.dart';
+import 'package:recipe_book_app/cubit/check_box_cubit.dart';
+import 'package:recipe_book_app/cubit/cubit/recent_recipes_cubit.dart';
 import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
 import 'package:recipe_book_app/screens/explore.dart';
 import 'package:recipe_book_app/screens/profile.dart';
@@ -17,7 +19,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int index = 0;
 
-  List<Widget> bodies = [RecipesScreen(), ExploreScreen(), ProfileScreen()];
+  List<Widget> bodies = [
+    RecipesScreen(),
+    ExploreScreen(),
+
+    BlocProvider(
+      create: (context) => RecentRecipesCubit(context.read<AuthCubit>()),
+      child: ProfileScreen(),
+    ),
+  ];
 
   @override
   void initState() {

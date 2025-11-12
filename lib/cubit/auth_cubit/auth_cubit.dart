@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:recipe_book_app/data/auth_shared_preferences.dart';
-import 'package:recipe_book_app/data/user_model.dart';
+import 'package:recipe_book_app/data/models/user_model.dart';
 import 'package:recipe_book_app/services/firestore_service.dart';
 
 part 'auth_state.dart';

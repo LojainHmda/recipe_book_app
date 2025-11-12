@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http show get;
 import 'package:path/path.dart';
-import 'package:recipe_book_app/data/category_sqlite_db.dart';
-import 'package:recipe_book_app/data/recent_recipes_sqlite_db.dart';
-import 'package:recipe_book_app/data/recipe_model.dart';
+import 'package:recipe_book_app/data/sqlite/category_sqlite_db.dart';
+import 'package:recipe_book_app/data/sqlite/recent_recipes_sqlite_db.dart';
+import 'package:recipe_book_app/data/models/recipe_model.dart';
 part 'load_recipes_state.dart';
 
 class LoadRecipesCubit extends Cubit<LoadRecipesState> {

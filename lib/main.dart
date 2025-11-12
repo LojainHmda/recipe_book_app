@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipe_book_app/cubit/auth_cubit/auth_cubit.dart';
-import 'package:recipe_book_app/cubit/check_box_cubit.dart';
 import 'package:recipe_book_app/cubit/user_edit_cubit/user_edit_cubit.dart';
 import 'package:recipe_book_app/cubit/load_recipes_cubit/cubit/load_recipes_cubit.dart';
 import 'package:recipe_book_app/data/auth_shared_preferences.dart';
-import 'package:recipe_book_app/data/category_sqlite_db.dart';
-import 'package:recipe_book_app/data/recent_recipes_sqlite_db.dart';
+import 'package:recipe_book_app/data/sqlite/category_sqlite_db.dart';
+import 'package:recipe_book_app/data/sqlite/recent_recipes_sqlite_db.dart';
 import 'package:recipe_book_app/screens/food_list_by_country.dart';
 import 'package:recipe_book_app/screens/home_screen.dart';
 import 'package:recipe_book_app/screens/sign_in.dart';
@@ -14,7 +13,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:recipe_book_app/screens/sign_up.dart';
 import 'package:recipe_book_app/theme/colors.dart';
 import 'firebase_options.dart';
-import 'screens/profile.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

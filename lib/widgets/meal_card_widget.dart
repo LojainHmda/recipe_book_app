@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:recipe_book_app/cubit/check_box_cubit.dart';
 import 'package:recipe_book_app/cubit/user_edit_cubit/user_edit_cubit.dart';
-import 'package:recipe_book_app/data/recent_recipes_sqlite_db.dart';
-import 'package:recipe_book_app/data/recipe_model.dart';
+import 'package:recipe_book_app/data/sqlite/recent_recipes_sqlite_db.dart';
+import 'package:recipe_book_app/data/models/recipe_model.dart';
 import 'package:recipe_book_app/screens/meal_screen.dart';
 import 'package:recipe_book_app/theme/fonts.dart';
 
@@ -17,7 +18,12 @@ class MealCardWidget extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MealScreen(recipe: model)),
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (context) => CheckBoxCubit(),
+              child: MealScreen(recipe: model),
+            ),
+          ),
         );
         context.read<UserEditCubit>().insert(model.id.toString());
       },

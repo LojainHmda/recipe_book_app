@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recipe_book_app/data/recipe_model.dart' show RecipeModel;
+import 'package:recipe_book_app/data/models/recipe_model.dart' show RecipeModel;
 
 import 'meal_card_widget.dart';
 

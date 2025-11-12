@@ -2,14 +2,14 @@ class UserModel {
    String name;
    String email;
    String uid; 
-   String userProfile;
+   String? userProfile;
    List<String> fav;
 
   UserModel({
     required this.name,
     required this.email,
     required this.uid, 
-    this.userProfile="",
+    this.userProfile,
     this.fav = const [],
   });
 
@@ -28,7 +28,7 @@ factory UserModel.fromJson(Map<String, dynamic> json) {
     uid: json['uid'] ?? '',
     name: json['name'] ?? '',
     email: json['email'] ?? '',
-    userProfile: json['userProfile'] ?? '',
+    userProfile: json['userProfile'],
     fav: List<String>.from(json['fav'] ?? []),
   );
 }

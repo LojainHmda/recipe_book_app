@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:recipe_book_app/cubit/auth_cubit/auth_cubit.dart';
-import 'package:recipe_book_app/data/recent_recipes_sqlite_db.dart';
-import 'package:recipe_book_app/data/user_model.dart';
+import 'package:recipe_book_app/data/sqlite/recent_recipes_sqlite_db.dart';
+import 'package:recipe_book_app/data/models/user_model.dart';
 import 'package:recipe_book_app/services/firestore_service.dart';
 
 part 'user_edit_state.dart';
@@ -56,12 +56,6 @@ class UserEditCubit extends Cubit<UserEditState> {
 
  
 
-  Future<List<String>> getRecentRecepies() async {
-    List<String> recentRecipes = await RecentRecipesSqliteDb.getQueries(
-      authCubit.userModel.uid,
-    );
-    return recentRecipes;
-  }
 
   Future<void> insert(String modelId) async {
     await RecentRecipesSqliteDb.insert(modelId, authCubit.userModel.uid);
@@ -69,10 +63,5 @@ class UserEditCubit extends Cubit<UserEditState> {
 
   }
 
-  Future<bool> recentRecipeIsEmpty() async {
-    if (await RecentRecipesSqliteDb.isEmpty(authCubit.userModel.uid)) {
-      return true;
-    }
-    return false;
-  }
+
 }
